@@ -2,6 +2,7 @@ import turtle
 from math import dist
 from numpy import cumsum
 
+
 class Graph:
     def __init__(self):
         self.edges = {}
@@ -9,38 +10,37 @@ class Graph:
 
     def neighbors(self, id):
         return self.edges[id]
-    
+
+
 def costofPath(path, graph):
     # Returns the cumulated cost of path
     cum_costs = [0]
-    for i in range(len(path)-1):
+    for i in range(len(path) - 1):
         cum_costs += [1]
-
     return cumsum(cum_costs)
 
-def draw_square(node_id, color="medium sea green", scale=1, 
-    correction=345, ts=None, text=None):
-    """
 
-    """
-    if ts == None:
+def draw_square(node_id, color="medium sea green", scale=1,
+                correction=345, ts=None, text=None):
+    if ts is None:
         ts = turtle.Turtle(shape="square")
     ts.shapesize(0.5, 0.5)
     ts.color(color)
     ts.penup()
     x, y = geo_pos(node_id)
-    ts.goto(x*scale, correction - y*scale)
-    if text != None:
+    ts.goto(x * scale, correction - y * scale)
+    if text is not None:
         ts.write(str(text), font=("Arial", 20, "normal"))
 
+
 def drawMazeSection(t):
-  correction=345
-  scale=1
-  for i in range(1,51):
-      x, y = geo_pos(str(i))
-      t.goto(x*scale, correction - y*scale)
-      print(str(i),' : ',dist((x,y),(564, 280)))
-      
+    correction = 345
+    scale = 1
+    for i in range(1, 51):
+        x, y = geo_pos(str(i))
+        t.goto(x * scale, correction - y * scale)
+
+
 def findleastF(oL):
     """
     finds the node with least F in oL (queue)
@@ -50,7 +50,8 @@ def findleastF(oL):
     for ni in range(len(oL)):
         if oL[ni][1] == mF:
             return oL.pop(ni)[0]
-        
+
+
 def getF(oL):
     """
     Returns costs of queue F = C + H
@@ -59,20 +60,20 @@ def getF(oL):
     """
     return [i[1] for i in oL]
 
+
 def pathfromOrigin(origin, n, parents):
     # Builds shortest path from search result (parents)
     if origin == n:
         return []
-
     pathO = [n]
     i = n
-
     while True:
+
         i = parents[i]
         pathO.insert(0, i)
         if i == origin:
             return pathO
-      
+
 
 def aStar(graph, start, goal):
     openL = []
@@ -85,10 +86,8 @@ def aStar(graph, start, goal):
     while bool(len(openL)):
         current = findleastF(openL)
         draw_square(current)  # Draw search expansion
-
         if current == goal:
             break
-
         for successor in graph.neighbors(current):
             newCost = costSoFar[current] + 1
             if successor not in costSoFar or newCost < costSoFar[successor]:
@@ -96,36 +95,61 @@ def aStar(graph, start, goal):
                 priority = newCost + heuristic(successor)
                 openL.append((successor, priority))
                 parents[successor] = current
-
         print(openL)
-
     return parents
-  
-def dfs_non_recursive(graph, source):
+
+
+def dfs_non_recursive(graph, source, endNode):
     parents = {}
-    print('HOla')
     parents[source] = None
-    #if source is None or source not in graph.neighbors(source):
-     #    return "Invalid input"
+    # if source is None or source not in graph.neighbors(source):
+    #    return "Invalid input"
     path = []
     stack = [source]
-    while(len(stack) != 0):
-        print('HOla')
+    while len(stack) != 0:
         s = stack.pop()
-        print(type(s))
-        print(graph.neighbors(s)[0])
+        draw_square(s)
+        if s == endNode:
+            break
         if s not in path:
             path.append(s)
-        if s not in graph.neighbors(s)[0]:
-            #leaf node
+        if s not in graph.edges.keys():
+            # leaf node
             continue
-        for neighbor in graph[s]:
-            stack.append(neighbor)
-            print(neighbor)
-    return " ".join(path)
-            
-            
-  
+
+        for neighbor in graph.neighbors(s):
+            if neighbor not in path:
+                stack.append(neighbor)
+                parents[neighbor] = s
+    return parents
+
+
+def bfs_non_recursive(graph, source, endNode):
+    parents = {}
+    parents[source] = None
+    # if source is None or source not in graph.neighbors(source):
+    #    return "Invalid input"
+    path = []
+    stack = [source]
+    while len(stack) != 0:
+        s = stack.pop(0)
+        if s == endNode:
+            draw_square(s)
+            break
+        if s not in path:
+            path.append(s)
+            draw_square(s)
+        if s not in graph.edges.keys():
+            # leaf node
+            continue
+
+        for neighbor in graph.neighbors(s):
+            if neighbor not in path:
+                stack.append(neighbor)
+                parents[neighbor] = s
+    return parents
+
+
 def geo_pos(id):
     """
     Builds Maze's cities positional information 
@@ -187,106 +211,87 @@ def geo_pos(id):
     }
 
     return G[id]
-  
+
+
 def heuristic(id):
     """
     Builds Maze heuristic
     """
     H = {
-        '1'  :  555.1936599061628,
-        '2'  :  504.4601074416093,
-        '3' :  454.9637348185018,
-        '4' :  430.1627598944381,
-        '5' :  482.21157182299146,
-        '6' :  535.0588752651432,
-        '7' :  520.1999615532472,
-        '8' :  465.66941063376714,
-        '9' :  455.45581563967323,
-        '10'  :  399.93999549932494,
-        '11'  :  411.53371672318667,
-        '12'  :  357.9720659492861,
-        '13'  :  511.0772935672255,
-        '14'  :  508.0,
-        '15'  :  452.0,
-        '16'  :  396.0,
-        '17'  :  340.0,
-        '18'  :  344.58090486850836,
-        '19'  :  289.4684784220901,
-        '20'  :  284.0,
-        '21'  :  228.0,
-        '22'  :  305.28675044947494,
-        '23'  :  329.9696955782455,
-        '24'  :  379.24134795668044,
-        '25'  :  407.1559897631373,
-        '26'  :  352.3634487287239,
-        '27'  :  310.4851043125902,
-        '28'  :  272.85344051340087,
-        '29'  :  274.6943756249844,
-        '30'  :  241.8677324489565,
-        '31'  :  196.9466932954194,
-        '32'  :  157.6863976378432,
-        '33'  :  197.5854245636555,
-        '34'  :  246.54614172604687,
-        '35'  :  227.20035211240318,
-        '36'  :  224.0200883849482,
-        '37'  :  168.01190434013893,
-        '38'  :  175.86358349584486,
-        '39'  :  122.24974437601085,
-        '40'  :  72.47068372797375,
-        '41'  :  56.1426753904728,
-        '42'  :  112.16059914247961,
-        '43'  :  108.55873986004076,
-        '44'  :  100.0,
-        '45'  :  152.0,
-        '46'  :  52.0,
-        '47'  :  0.0,
-        '48'  :  245.08773939142694,
-        '49'  :  219.2715211786519,
-        '50'  :  172.35138525698017
+        '1': 555.1936599061628,
+        '2': 504.4601074416093,
+        '3': 454.9637348185018,
+        '4': 430.1627598944381,
+        '5': 482.21157182299146,
+        '6': 535.0588752651432,
+        '7': 520.1999615532472,
+        '8': 465.66941063376714,
+        '9': 455.45581563967323,
+        '10': 399.93999549932494,
+        '11': 411.53371672318667,
+        '12': 357.9720659492861,
+        '13': 511.0772935672255,
+        '14': 508.0,
+        '15': 452.0,
+        '16': 396.0,
+        '17': 340.0,
+        '18': 344.58090486850836,
+        '19': 289.4684784220901,
+        '20': 284.0,
+        '21': 228.0,
+        '22': 305.28675044947494,
+        '23': 329.9696955782455,
+        '24': 379.24134795668044,
+        '25': 407.1559897631373,
+        '26': 352.3634487287239,
+        '27': 310.4851043125902,
+        '28': 272.85344051340087,
+        '29': 274.6943756249844,
+        '30': 241.8677324489565,
+        '31': 196.9466932954194,
+        '32': 157.6863976378432,
+        '33': 197.5854245636555,
+        '34': 246.54614172604687,
+        '35': 227.20035211240318,
+        '36': 224.0200883849482,
+        '37': 168.01190434013893,
+        '38': 175.86358349584486,
+        '39': 122.24974437601085,
+        '40': 72.47068372797375,
+        '41': 56.1426753904728,
+        '42': 112.16059914247961,
+        '43': 108.55873986004076,
+        '44': 100.0,
+        '45': 152.0,
+        '46': 52.0,
+        '47': 0.0,
+        '48': 245.08773939142694,
+        '49': 219.2715211786519,
+        '50': 172.35138525698017
     }
 
     return H[id]
-    
-  
-colors = ["blue"]
-y = 160
-#screen = turtle.Screen()  
-#screen.setup(600, 327) 
-#turtle.setworldcoordinates(0, 0, 600, 327) 
-#turtle.bgpic('Picture1.png') 
-#canvas = screen.getcanvas()
-#canvas.itemconfig(screen._bgpic, anchor="sw")
+
 
 def main(argv):
     """
-    Usage:
-      python aStarMaze.py <startNode>
-      Final city will always be Bucarest
-      <startNode>:  Any city from
-      Arad
-      Zerind
-      Timisoara
-      Oradea
-      Lugoj
-      Mehadia
-      Dobreta
-      Sibiu
-      Rimnicu
-      Craiova
-      Fagaras
-      Pitesi
-
-    Example:
-      python aStarMaze.py Timisoara
-    """
-    if len(argv) != 1:
+        EJEMPLO DE USO:
+          python deber2.py 1 1
+          argumento 1: Nodo inicial
+          argumento 2: Algoritmo a usar>>
+          1>> A*
+          2>> DFS
+          3>> BFS
+          4>> Greddy
+        """
+    if len(argv) != 2:
         print(main.__doc__)
     else:
         startNode = argv[0]
+        algorithm = argv[1]
 
         # Always Bucarest due to heuristic is given for this end city
         endNode = '47'
-
         Maze = Graph()  # Builds Maze Graph
 
         # Adding edges (adjacency list)
@@ -338,8 +343,8 @@ def main(argv):
             '45': ['44'],
             '46': ['44', '47'],
             '47': ['46'],
-            '48': ['22','49'],
-            '49': ['48','50'],
+            '48': ['22', '49'],
+            '49': ['48', '50'],
             '50': ['49']
         }
 
@@ -348,9 +353,9 @@ def main(argv):
             return
 
         # Define screen and World Wide coordinates
-        screen = turtle.Screen()  
-        screen.setup(600, 327) 
-        turtle.setworldcoordinates(0, 0, 600, 327) 
+        screen = turtle.Screen()
+        screen.setup(600, 327)
+        turtle.setworldcoordinates(0, 0, 600, 327)
 
         # Use image as backgroud (image is 600x327 pixels)
         turtle.bgpic('Picture1.png')
@@ -359,11 +364,14 @@ def main(argv):
         canvas = screen.getcanvas()
         canvas.itemconfig(screen._bgpic, anchor="sw")
 
-        # Building aStar path of parents
-        parents = aStar(Maze, startNode, endNode)
-        
-        #parents = dfs_non_recursive(Maze,'1')
-        #parents = dfs(visited, Maze, '1',parentsDfs)
+        if algorithm == '1':
+            # Building aStar path of parents
+            parents = aStar(Maze, startNode, endNode)
+        if algorithm == '2':
+            parents = dfs_non_recursive(Maze, '1', endNode)
+        if algorithm == '3':
+            parents = bfs_non_recursive(Maze, '1', endNode)
+        # parents = dfs(visited, Maze, '1',parentsDfs)
 
         # Calculating and printing the shortest path
         shortest_path = pathfromOrigin(startNode, endNode, parents)
@@ -372,7 +380,7 @@ def main(argv):
         # Calculating the cost of the shortest path
         cost_tsp = costofPath(shortest_path, Maze)
 
-        # Draw shortest path 
+        # Draw shortest path
         for ni in shortest_path:
             draw_square(ni, color="salmon")
 
@@ -388,5 +396,3 @@ def main(argv):
 if __name__ == "__main__":
     import sys
     main(sys.argv[1:])
-    
-
