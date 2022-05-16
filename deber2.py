@@ -98,6 +98,33 @@ def aStar(graph, start, goal):
         print(openL)
     return parents
 
+#function greedy algorithm
+def greedy(graph, start, goal):
+    openL = []
+    openL.append((start, 0))
+    parents = {}
+    costSoFar = {}
+    parents[start] = None
+    costSoFar[start] = 0
+
+    while bool(len(openL)):
+        current = findleastF(openL)
+        draw_square(current)  # Draw search expansion
+        
+        if current == goal:
+            break
+        
+        for successor in graph.neighbors(current):
+            newCost = costSoFar[current] + 1
+            if successor not in costSoFar or newCost < costSoFar[successor]:
+                costSoFar[successor] = newCost
+                priority = heuristic(successor)
+                openL.append((successor, priority))
+                parents[successor] = current
+                
+        print(openL)
+        
+    return parents
 
 def dfs_non_recursive(graph, source, endNode):
     parents = {}
@@ -371,6 +398,8 @@ def main(argv):
             parents = dfs_non_recursive(Maze, '1', endNode)
         if algorithm == '3':
             parents = bfs_non_recursive(Maze, '1', endNode)
+        if algorithm == '4':
+            parents = greedy(Maze, startNode, endNode)    
         # parents = dfs(visited, Maze, '1',parentsDfs)
 
         # Calculating and printing the shortest path
