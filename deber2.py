@@ -395,9 +395,9 @@ def main(argv):
             # Building aStar path of parents
             parents = aStar(Maze, startNode, endNode)
         if algorithm == '2':
-            parents = dfs_non_recursive(Maze, '1', endNode)
+            parents = dfs_non_recursive(Maze, startNode, endNode)
         if algorithm == '3':
-            parents = bfs_non_recursive(Maze, '1', endNode)
+            parents = bfs_non_recursive(Maze, startNode, endNode)
         if algorithm == '4':
             parents = greedy(Maze, startNode, endNode)    
         # parents = dfs(visited, Maze, '1',parentsDfs)
